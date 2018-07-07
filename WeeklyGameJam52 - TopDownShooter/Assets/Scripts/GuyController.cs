@@ -1,28 +1,35 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GuyController : MonoBehaviour {
+	public int health = 5;
     public float speed = 5f;
-    public Gun weaponSlot1, weaponSlot2, weaponSlot3;
-    public Transform gunPos;
+	public Ammo[] ammo;
+	public Transform gun;
+    public Transform gunMuzzle;
+
+	public Text ammo1num, ammo2num, ammo3num;
+	public Image[] ammoBGHighlight;
 
 
-    Gun currentGun;
+	int currentAmmoIndex;
+	public int[] ammoNum;
 
-    float fireNewTime = 0;
-    Transform gunMuzzle;
-    GameObject gunGun;
+	Ammo currentAmmo;
 
     Camera cam;
+	public SpriteRenderer guySP;
+	public Transform gunTrans;
+	public Sprite leftRightSprite, upDownSprite;
 
 	// Use this for initialization
 	void Start () {
         cam = Camera.main;
 
-        //temporary gunSetup
-        ChangeWeapon(1);
-
+		currentAmmo = ammo[0];
+		UpdateAmmoHighlight(0);
 	}
 	
 	// Update is called once per frame
@@ -30,121 +37,127 @@ public class GuyController : MonoBehaviour {
         Movement();
         Shooting();
         ChoosingWeapon();
+		UpdateUI();
 	}
 
 
     void ChoosingWeapon() {
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
-            ChangeWeapon(1);
-
+			currentAmmoIndex = 0;
+			UpdateAmmoHighlight(0);
         }
         else if (Input.GetKeyDown(KeyCode.Alpha2)) {
 
-            ChangeWeapon(2);
+			currentAmmoIndex = 1;
+			UpdateAmmoHighlight(1);
         }
         else if (Input.GetKeyDown(KeyCode.Alpha3))
         {
 
-            ChangeWeapon(3);
+			currentAmmoIndex = 2;
+			UpdateAmmoHighlight(2);
         }
 
 
     }
 
 
-    void ChangeWeapon(int weaponNum) {
-        if (gunGun != null)
-        {
-            Destroy(gunGun.gameObject);
-            gunGun = null;
-        }
-
-        Debug.Log("Change Weapon to Weapon #" + weaponNum);
-        if (weaponNum == 1)
-        {
-            gunGun = Instantiate(weaponSlot1.gunObject, gunPos.position, gunPos.rotation);
-            gunMuzzle = gunGun.GetComponentInChildren<Muzzle>().transform;
-            gunGun.transform.parent = transform;
-            currentGun = weaponSlot1;
-
-        }
-        else if (weaponNum == 2) {
-
-            gunGun = Instantiate(weaponSlot2.gunObject, gunPos.position, gunPos.rotation);
-            gunMuzzle = gunGun.GetComponentInChildren<Muzzle>().transform;
-            gunGun.transform.parent = transform;
-            currentGun = weaponSlot2;
-
-        }
-        else if (weaponNum == 3)
-        {
-
-            gunGun = Instantiate(weaponSlot3.gunObject, gunPos.position, gunPos.rotation);
-            gunMuzzle = gunGun.GetComponentInChildren<Muzzle>().transform;
-            gunGun.transform.parent = transform;
-            currentGun = weaponSlot3;
-
-        }
-
-    }
+    
 
 
 
 
 
     void Shooting() {
-        if (currentGun != null)
-        {
-            if (currentGun.isAutomatic)
-            {
-                if (Input.GetButton("Fire1"))
+
+
+                if (Input.GetButtonDown("Fire1"))
                 {
 
 
-                    if (Time.time > fireNewTime + (1 / currentGun.fireRate))
+			    if (ammoNum[currentAmmoIndex] > 0)
                     {
-                        Debug.Log("Fire with " + currentGun.gunName + " for " + currentGun.damage);
-                        GameObject bullet = Instantiate(currentGun.bullet, gunMuzzle.position, gunMuzzle.rotation);
+				
+				    GameObject bullet = Instantiate(ammo[currentAmmoIndex].bulletToSpawn , gunMuzzle.position, gunMuzzle.rotation);
                         Bullet bulletScript = bullet.GetComponent<Bullet>();
-                        bulletScript.SetDamage(currentGun.damage, currentGun.bulletSpeed);
-
-
-                        fireNewTime = Time.time;
+				        bulletScript.SetDamage(currentAmmo.damage, currentAmmo.bulletSpeed);
+				ammoNum[currentAmmoIndex]--;
                     }
                 }
             }
-            else {
-                if (Input.GetButtonDown("Fire1")) {
-
-                    if (Time.time > fireNewTime + (1 / currentGun.fireRate))
-                    {
-                        Debug.Log("Fire with  " + currentGun.gunName + " for " + currentGun.damage);
-                       
-
-
-                            GameObject bullet = Instantiate(currentGun.bullet, gunMuzzle.position, gunMuzzle.rotation);
-                            Bullet bulletScript = bullet.GetComponent<Bullet>();
-                            bulletScript.SetDamage(currentGun.damage, currentGun.bulletSpeed);
-                        
-
-                        fireNewTime = Time.time;
-                    }
-                }
-            }
-        }
-    }
+            
+   
 
 
     void Movement() {
+		//Move Player
         float h = Input.GetAxis("Horizontal");
         float v = Input.GetAxis("Vertical");
-        Vector3 mousePos = cam.ScreenToWorldPoint(Input.mousePosition) - transform.position;
-        mousePos.Normalize();
-        float rotZ = Mathf.Atan2(mousePos.y, mousePos.x) * Mathf.Rad2Deg;
-        transform.rotation = Quaternion.Euler(0, 0, rotZ - 90);
+		transform.position += new Vector3(h, v, 0) * Time.deltaTime * speed;
+		if(h < 0){
+			guySP.flipX = true;         
+		} else if(h > 0) {
+			guySP.flipX = false;
+		}
+		if(v != 0 && h == 0){
+			guySP.sprite = upDownSprite;
+			if(v < 0){
+				guySP.flipY = true;
+			} else {
+				guySP.flipY = false;
+			}
+		} else {
+			guySP.sprite = leftRightSprite;
 
-        transform.position += new Vector3(h, v, 0) * Time.deltaTime * speed;
+		}
+
+
+
+		//RotateGun
+		Vector3 gunScale = gunTrans.localScale;
+		Vector3 mousePos = cam.ScreenToWorldPoint(Input.mousePosition) - transform.position;
+		//Debug.Log("Player Position " + transform.position + " Mouse Pos is " + mousePos);
+
+
+
+
+		if(Input.mousePosition.x < (Screen.width/2)){
+			mousePos.Normalize();
+            float rotZ = Mathf.Atan2(mousePos.y, mousePos.x) * Mathf.Rad2Deg;
+			gun.rotation = Quaternion.Euler(0, 0, rotZ - 90);
+			gunScale.x = -1;         
+		} else {
+			mousePos.Normalize();
+            float rotZ = Mathf.Atan2(mousePos.y, mousePos.x) * Mathf.Rad2Deg;
+			gun.rotation = Quaternion.Euler(0, 0, rotZ - 90);
+			gunScale.x = 1;         
+		}
+
+		gunTrans.localScale = gunScale;
 
     }
+
+
+	void UpdateUI(){
+		ammo1num.text = ammoNum[0].ToString();
+		ammo2num.text = ammoNum[1].ToString();
+		ammo3num.text = ammoNum[2].ToString();
+
+
+	}
+
+	void UpdateAmmoHighlight(int ammoIndex){
+		for (int i = 0; i < ammoBGHighlight.Length; i++){
+			ammoBGHighlight[i].gameObject.SetActive(false);
+		}
+
+		ammoBGHighlight[ammoIndex].gameObject.SetActive(true);
+
+	}
+
+	public void TakeDamage(float newDamage){
+		health -= (int)newDamage;
+
+	}
 }

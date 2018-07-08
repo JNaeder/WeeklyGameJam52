@@ -11,7 +11,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7b72bdfbb374d423488c0ba5451377ca, type: 3}
   m_Name: Pen
   m_EditorClassIdentifier: 
-  name: Pen
+  ammoName: Pen
   damage: 1
   bulletSpeed: 10
   bulletToSpawn: {fileID: 1249797651321660, guid: ad11a434639924c239678f91c7fe7114,

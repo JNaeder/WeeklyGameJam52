@@ -23,7 +23,7 @@ GameObject:
   - component: {fileID: 58872975798363828}
   - component: {fileID: 50504318122827526}
   - component: {fileID: 114792671353821426}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Mug_PickUp
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -89,6 +89,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cadc12d285be6468db49c72b83ed76bf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ammoIndex: 1
 --- !u!212 &212301440173983048
 SpriteRenderer:
   m_ObjectHideFlags: 1

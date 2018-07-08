@@ -227,6 +227,7 @@ MonoBehaviour:
   ammo1num: {fileID: 0}
   ammo2num: {fileID: 0}
   ammo3num: {fileID: 0}
+  healthNum: {fileID: 0}
   ammoBGHighlight:
   - {fileID: 0}
   - {fileID: 0}

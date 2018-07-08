@@ -23,7 +23,7 @@ GameObject:
   - component: {fileID: 58509964505861476}
   - component: {fileID: 50741676966512674}
   - component: {fileID: 114638317780467236}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Stapler_PickUp
   m_TagString: Untagged
   m_Icon: {fileID: 0}

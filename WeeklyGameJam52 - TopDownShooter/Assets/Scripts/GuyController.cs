@@ -10,7 +10,7 @@ public class GuyController : MonoBehaviour {
 	public Transform gun;
     public Transform gunMuzzle;
 
-	public Text ammo1num, ammo2num, ammo3num;
+	public Text ammo1num, ammo2num, ammo3num, healthNum;
 	public Image[] ammoBGHighlight;
 
 
@@ -24,21 +24,72 @@ public class GuyController : MonoBehaviour {
 	public Transform gunTrans;
 	public Sprite leftRightSprite, upDownSprite;
 
-	// Use this for initialization
-	void Start () {
+    public float specialCap, specialStartNum;
+    float  specialBarPerc;
+    public Image specialBarFront, specialReaduButton;
+    public  bool isSpecialTime;
+    public float slowDownTime;
+
+    [Range(80, 100)]
+    public float angleCorrection;
+    [Range(-10, 10)]
+    public float angleAdjustment;
+
+    GameManager gM;
+
+    // Use this for initialization
+    void Start () {
         cam = Camera.main;
+        gM = FindObjectOfType<GameManager>();
 
 		currentAmmo = ammo[0];
 		UpdateAmmoHighlight(0);
+        specialStartNum = specialCap;
+        specialCap = 0;
 	}
 	
 	// Update is called once per frame
 	void Update () {
-        Movement();
+        
         Shooting();
         ChoosingWeapon();
 		UpdateUI();
+        Special();    
 	}
+
+    void FixedUpdate()
+    {
+        Movement();
+    }
+
+    void Special() {
+        Mathf.Round(specialCap);
+        if (Input.GetKeyDown(KeyCode.LeftShift)) {
+            if (!isSpecialTime)
+            {
+                Debug.Log("Special!");
+                isSpecialTime = true;
+            }
+
+        }
+
+
+        if (isSpecialTime) {
+            if (specialCap > 0)
+            {
+                specialCap -= Time.deltaTime;
+
+
+                Time.timeScale = 1 / slowDownTime;
+            }
+            else {
+                Time.timeScale = 1;
+                isSpecialTime = false;
+
+            }
+
+        }
+    }
 
 
     void ChoosingWeapon() {
@@ -81,7 +132,7 @@ public class GuyController : MonoBehaviour {
 				
 				    GameObject bullet = Instantiate(ammo[currentAmmoIndex].bulletToSpawn , gunMuzzle.position, gunMuzzle.rotation);
                         Bullet bulletScript = bullet.GetComponent<Bullet>();
-				        bulletScript.SetDamage(currentAmmo.damage, currentAmmo.bulletSpeed);
+				        bulletScript.SetDamage(ammo[currentAmmoIndex].damage, ammo[currentAmmoIndex].bulletSpeed);
 				ammoNum[currentAmmoIndex]--;
                     }
                 }
@@ -94,15 +145,19 @@ public class GuyController : MonoBehaviour {
 		//Move Player
         float h = Input.GetAxis("Horizontal");
         float v = Input.GetAxis("Vertical");
-		transform.position += new Vector3(h, v, 0) * Time.deltaTime * speed;
-		if(h < 0){
+        float h_raw = Input.GetAxisRaw("Horizontal");
+        float v_raw = Input.GetAxisRaw("Vertical");
+
+       //Flip Sprites
+        transform.position += new Vector3(h, v, 0) * Time.deltaTime * speed * (1/Time.timeScale);
+		if(h_raw < 0){
 			guySP.flipX = true;         
-		} else if(h > 0) {
+		} else if(h_raw > 0) {
 			guySP.flipX = false;
 		}
-		if(v != 0 && h == 0){
+		if(v_raw != 0 && h_raw == 0){
 			guySP.sprite = upDownSprite;
-			if(v < 0){
+			if(v_raw < 0){
 				guySP.flipY = true;
 			} else {
 				guySP.flipY = false;
@@ -116,21 +171,18 @@ public class GuyController : MonoBehaviour {
 
 		//RotateGun
 		Vector3 gunScale = gunTrans.localScale;
-		Vector3 mousePos = cam.ScreenToWorldPoint(Input.mousePosition) - transform.position;
-		//Debug.Log("Player Position " + transform.position + " Mouse Pos is " + mousePos);
+        Vector3 mousePos = new Vector3(Input.mousePosition.x, Input.mousePosition.y, 10);
+        Vector3 lookPos = cam.ScreenToWorldPoint(mousePos);
+        lookPos = lookPos - gunTrans.position;
+        float angle = Mathf.Atan2(lookPos.y, lookPos.x) * Mathf.Rad2Deg;
+        gunTrans.rotation = Quaternion.Euler(0, 0, angle - 90f);
 
 
 
 
 		if(Input.mousePosition.x < (Screen.width/2)){
-			mousePos.Normalize();
-            float rotZ = Mathf.Atan2(mousePos.y, mousePos.x) * Mathf.Rad2Deg;
-			gun.rotation = Quaternion.Euler(0, 0, rotZ - 90);
 			gunScale.x = -1;         
 		} else {
-			mousePos.Normalize();
-            float rotZ = Mathf.Atan2(mousePos.y, mousePos.x) * Mathf.Rad2Deg;
-			gun.rotation = Quaternion.Euler(0, 0, rotZ - 90);
 			gunScale.x = 1;         
 		}
 
@@ -144,6 +196,22 @@ public class GuyController : MonoBehaviour {
 		ammo2num.text = ammoNum[1].ToString();
 		ammo3num.text = ammoNum[2].ToString();
 
+        healthNum.text = health.ToString();
+
+        if (Mathf.Round(specialCap) <= specialStartNum)
+        {
+            specialBarPerc = specialCap / specialStartNum;
+            Vector3 barScale = specialBarFront.transform.localScale;
+            barScale.y = specialBarPerc;
+            specialBarFront.transform.localScale = barScale;
+        }
+        if (Mathf.Round(specialCap) >= specialStartNum)
+        {
+            specialReaduButton.color = Color.red;
+        }
+        else {
+            specialReaduButton.color = Color.grey;
+        }
 
 	}
 
@@ -158,6 +226,18 @@ public class GuyController : MonoBehaviour {
 
 	public void TakeDamage(float newDamage){
 		health -= (int)newDamage;
+        if (health <= 0) {
+            Death();
 
+        }
 	}
+
+    public void Death() {
+        gM.SetHighScore();
+        gM.ShowDeathScreen();
+        
+        Destroy(gameObject);
+
+
+    }
 }

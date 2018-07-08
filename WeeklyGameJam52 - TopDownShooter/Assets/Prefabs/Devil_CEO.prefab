@@ -19,7 +19,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4536242310802472}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: HealthBar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -35,7 +35,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4534575176540892}
   - component: {fileID: 212080770482617628}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Bar Green
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -51,7 +51,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4109574929677832}
   - component: {fileID: 212015399021104754}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Bar Red
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -69,7 +69,7 @@ GameObject:
   - component: {fileID: 58413694363514070}
   - component: {fileID: 50565447329203358}
   - component: {fileID: 114187940756915194}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Devil_CEO
   m_TagString: Enemy
   m_Icon: {fileID: 0}
@@ -85,7 +85,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4015146491902410}
   - component: {fileID: 212999517465103804}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Circle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -212,6 +212,13 @@ MonoBehaviour:
   damageToPlayer: 1
   points: 100
   healthBarGreen: {fileID: 4534575176540892}
+  drops:
+  - {fileID: 1041557071080594, guid: 7f8e0674950254ce79004d017cf98dcc, type: 2}
+  - {fileID: 1028436254194614, guid: a141c259e53284f5a86b003eaaf411c2, type: 2}
+  - {fileID: 1563494877344046, guid: b70a6b4faac714a6eb2b8eb6ab8bcf3b, type: 2}
+  dropRange: 2
+  minDropNum: 3
+  maxDropNum: 7
 --- !u!212 &212015399021104754
 SpriteRenderer:
   m_ObjectHideFlags: 1

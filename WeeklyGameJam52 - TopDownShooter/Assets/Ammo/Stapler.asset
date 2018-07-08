@@ -11,7 +11,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7b72bdfbb374d423488c0ba5451377ca, type: 3}
   m_Name: Stapler
   m_EditorClassIdentifier: 
-  name: Stapler
+  ammoName: Stapler
   damage: 5
   bulletSpeed: 8
   bulletToSpawn: {fileID: 1507835990372808, guid: f6eaf709fbf8c4bb49310131da7ccebe,

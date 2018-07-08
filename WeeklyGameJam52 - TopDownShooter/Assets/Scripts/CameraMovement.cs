@@ -15,8 +15,11 @@ public class CameraMovement : MonoBehaviour {
 	
 	// Update is called once per frame
 	void FixedUpdate () {
-        Vector3 transPos = transform.position;
-        transPos = Vector3.Lerp(transPos, player.position + diff, speed * Time.deltaTime);
-        transform.position = transPos;
+        if (player != null)
+        {
+            Vector3 transPos = transform.position;
+            transPos = Vector3.Lerp(transPos, player.position + diff, speed * Time.deltaTime);
+            transform.position = transPos;
+        }
 	}
 }
